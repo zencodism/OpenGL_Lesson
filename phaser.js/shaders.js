@@ -2,10 +2,10 @@ var game = new Phaser.Game(512, 512, Phaser.AUTO, 'phaser-example', { preload: p
 
 function preload() {
 
-//    game.load.image('background', '../assets/castle.png');
-//    game.load.image('background_normal', '../assets/castle_normal.png');
-    game.load.image('background', '../assets/ground.png');
-    game.load.image('background_normal', '../assets/ground_normal.png');
+//    game.load.image('background', '../assets/whitestone.png');
+//    game.load.image('background_normal', '../assets/sphere_norm.jpg');
+    game.load.image('background', '../assets/grass.jpeg');
+    game.load.image('background_normal', '../assets/moss_normal.jpg');
 
 }
 
@@ -72,7 +72,8 @@ function create() {
     filter = new Phaser.Filter(game, customUniforms, fragmentSrc);
     filter.setResolution(512, 512);
     
-    sprite.filters = [ filter ];
+    this.game.stage.filters = [filter];
+//    sprite.filters = [ filter ];
 //    normal.visible = false;
 
 }
