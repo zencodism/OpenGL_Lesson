@@ -1,8 +1,14 @@
-var game = new Phaser.Game(512, 512, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(1024, 512, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 function preload() {
+
+    game.load.image('default', '../assets/grass.jpeg');
+    game.load.image('default_normal', '../assets/moss_normal.jpg');
+//    game.load.image('background', '../assets/grass2.jpeg');
+//    game.load.image('background_normal', '../assets/grass2_norm.jpeg');
       game.load.image('background', '../assets/castle.png');
-      game.load.image('background_normal', '../assets/castle_normal.jpg');
+      game.load.image('background_normal', '../assets/sphere_norm.jpg');
+
 }
 
 var filter;
@@ -60,22 +66,30 @@ function create() {
     ];
     
 
-//    normal = game.add.sprite(0, 0, 'background_normal'); 
-    normal = game.make.image(0, 0, 'background_normal');
-    normalmap = game.add.renderTexture(512, 512, 'normalmap');
-    normalmap.renderXY(normal, 0, 0, true);
-    sprite = game.add.image(0, 0, 'background');
+//    normaldef = game.add.sprite(0, 0, 'default_normal'); 
+    normaldef = game.add.renderTexture(512, 512, 'default_normal'); 
+    spritedef = game.add.sprite(0, 0, 'default');
+    normal = game.add.sprite(513, 0, 'background_normal'); 
+    sprite = game.add.sprite(513, 0, 'background');
         
+   
         
     var customUniforms = {
-        uNormal: { type: 'sampler2D', value: normalmap, textureData: { repeat: true } }
+        uNormal: { type: 'sampler2D', value: normal.texture, textureData: { repeat: true } }
+    };
+    
+    var customUniformsDef = {
+        uNormal: { type: 'sampler2D', value: normaldef, textureData: { repeat: true } }
     };
     
     filter = new Phaser.Filter(game, customUniforms, fragmentSrc);
-    filter.setResolution(512, 512);
+    filterdef = new Phaser.Filter(game, customUniformsDef, fragmentSrc);
+    filter.setResolution(1024, 512);
+    filterdef.setResolution(1024, 512);
     
 //    this.game.stage.filters = [filter];
     sprite.filters = [ filter ];
+    spritedef.filters = [ filterdef ];
 //    normal.visible = false;
 
 }
@@ -83,5 +97,6 @@ function create() {
 function update() {
 
     filter.update(game.input.activePointer);
+    filterdef.update(game.input.activePointer);
 
 }
