@@ -1,9 +1,10 @@
 var game = new Phaser.Game(512, 512, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 function preload() {
-      game.load.image('background', '../assets/grass.jpeg');
-      game.load.image('background_normal', '../assets/grass2_norm.jpeg');
-      game.load.image('wizard', '../assets/wizard.png');
+    game.load.image('background', '../assets/grass.jpeg');
+    game.load.image('background_normal', '../assets/grass2_norm.jpeg');
+    game.load.image('wizard', '../assets/wizard.png');
+    game.load.spritesheet('butterfly', '../assets/butterfly.png', 70, 50, 13);
 }
 
 var filter;
@@ -40,7 +41,7 @@ function create() {
             "vec3 Ambient = AmbientColor.rgb * AmbientColor.a;",
             "vec3 Intensity = Ambient;",
             "int i = 0;",
-            "for(int i=0; i<1; i+=1) {",
+            "for(int i=0; i<2; i+=1) {",
                 "vec3 vLightPos = uLightPos[i];",//vec3(mouse.x, mouse.y, 0.08); //normalize(vec3(80.0, 40.0, 20.0));",          
                 "vec3 LightDir = vec3(vLightPos.xy - (gl_FragCoord.xy / resolution.xy), vLightPos.z);",
                 "vec4 LightColor = uLightColor[i];",//vec4(1.0, 0.8, 0.0, 0.8);",
@@ -73,17 +74,19 @@ function create() {
     normalmap = game.add.renderTexture(512, 512, 'normalmap');
     normalmap.renderXY(normal, 0, 0, true);
     sprite = game.add.image(0, 0, 'background');
-    wizard = game.add.sprite(game.world.centerX, game.world.centerY, 'wizard');
+    wizard = game.add.sprite(game.world.centerX, game.world.centerY, 'butterfly');
     wizard.anchor.setTo(0.5, 0.5);
+    wizard.animations.add('walk');
+    wizard.animations.play('walk', 35, true);
         
     var customUniforms = {
         uNormal: { type: 'sampler2D', value: normalmap, textureData: { repeat: true } },
         uLightCnt: { type: '1i', value: 3},
-        "uLightPos[0]": { type: '3f', value: {x: 0.3, y: 0.3, z: 0.08}},
-//        "uLightPos[1]": { type: '3f', value: {x: 0.8, y: 0.6, z: 0.05}},
+        "uLightPos[0]": { type: '3f', value: {x: 0.3, y: 0.3, z: 0.04}},
+        "uLightPos[1]": { type: '3f', value: {x: 0.8, y: 0.6, z: 0.05}},
 //        "uLightPos[2]": { type: '3f', value: {x: 0.6, y: 0.5, z: 0.05}},
-        "uLightColor[0]": { type: '4fv', value: [1.0, 0.2, 0.2, 0.9]},
-//        "uLightColor[1]": { type: '4fv', value: [0.2, 1.0, 0.2, 0.9]},
+        "uLightColor[0]": { type: '4fv', value: [0.0, 1.0, 1.0, 0.4]},
+        "uLightColor[1]": { type: '4fv', value: [1.0, 1.0, 0.2, 0.4]},
 //        "uLightColor[2]": { type: '4fv', value: [0.2, 0.2, 1.0, 0.9]},
     };
     
@@ -98,24 +101,32 @@ function create() {
 
 function update() {
 
-    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
+    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)
+       || game.input.keyboard.isDown(Phaser.Keyboard.A))
     {
         wizard.x -= 3;
     }
-    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
+    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)
+       || game.input.keyboard.isDown(Phaser.Keyboard.D))
     {
         wizard.x += 3;
     }
 
-    if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
+    if (game.input.keyboard.isDown(Phaser.Keyboard.UP)
+       || game.input.keyboard.isDown(Phaser.Keyboard.W))
     {
         wizard.y -= 3;
     }
-    else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
+    else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN)
+       || game.input.keyboard.isDown(Phaser.Keyboard.S))
     {
-        wizard.y += 3;
+        wizard.y += 3   ;
     }
-    filter.uniforms["uLightPos[0]"].value = {x: (wizard.x/game.width).toFixed(2), y: (1 - wizard.y/game.height).toFixed(2), z: 0.2};
+    
+    wizard.angle = 180.0 * Math.atan2(game.input.y-wizard.y, game.input.x-wizard.x) / Math.PI + 90;
+    
+    filter.uniforms["uLightPos[0]"].value = {x: (wizard.x/game.width).toFixed(2), y: (1 - wizard.y/game.height).toFixed(2), z: 0.08};
+    filter.uniforms["uLightPos[1]"].value = {x: (game.input.x/game.width).toFixed(2), y: (1 - game.input.y/game.height).toFixed(2), z: 0.08};
 //    filter.syncUniforms();
         
     filter.update(game.input.activePointer);
