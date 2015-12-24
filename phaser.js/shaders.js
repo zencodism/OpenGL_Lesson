@@ -1,8 +1,8 @@
 var game = new Phaser.Game(512, 512, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
 
 function preload() {
-    game.load.image('background', '../assets/grass.jpeg');
-    game.load.image('background_normal', '../assets/grass2_norm.jpeg');
+    game.load.image('background', '../assets/basic.png');
+    game.load.image('background_normal', '../assets/grassy_norm.png');
     game.load.image('wizard', '../assets/wizard.png');
     game.load.spritesheet('butterfly', '../assets/butterfly.png', 70, 50, 13);
 }
@@ -26,9 +26,8 @@ function create() {
         "uniform vec2 resolution;",
         "uniform sampler2D uSampler;",
         "uniform sampler2D uNormal;",
-        "uniform int uLightCnt;",
-        "uniform vec3 uLightPos[3];",
-        "uniform vec4 uLightColor[3];",
+        "uniform vec3 uLightPos[2];",
+        "uniform vec4 uLightColor[2];",
         
 
         "void main(void) {",
@@ -37,7 +36,7 @@ function create() {
             "vec3 NormalMap = texture2D(uNormal, swapped).rgb;",
             "vec3 N = normalize(NormalMap * 2.0 - 1.0);",
             "vec4 AmbientColor = vec4(0.7, 0.7, 0.7, 0.4);",    //ambient RGBA -- alpha is intensity ",
-            "vec3 Falloff = vec3(0.7, 0.6, 0.3);",    
+            "vec3 Falloff = vec3(0.9, 0.7, 0.4);",    
             "vec3 Ambient = AmbientColor.rgb * AmbientColor.a;",
             "vec3 Intensity = Ambient;",
             "int i = 0;",
@@ -81,14 +80,34 @@ function create() {
         
     var customUniforms = {
         uNormal: { type: 'sampler2D', value: normalmap, textureData: { repeat: true } },
-        uLightCnt: { type: '1i', value: 3},
         "uLightPos[0]": { type: '3f', value: {x: 0.3, y: 0.3, z: 0.04}},
         "uLightPos[1]": { type: '3f', value: {x: 0.8, y: 0.6, z: 0.05}},
-//        "uLightPos[2]": { type: '3f', value: {x: 0.6, y: 0.5, z: 0.05}},
-        "uLightColor[0]": { type: '4fv', value: [0.0, 1.0, 1.0, 0.4]},
-        "uLightColor[1]": { type: '4fv', value: [1.0, 1.0, 0.2, 0.4]},
+////        "uLightPos[2]": { type: '3f', value: {x: 0.6, y: 0.5, z: 0.05}},
+        "uLightColor[0]": { type: '4fv', value: [0.0, 1.0, 1.0, 0.5]},
+        "uLightColor[1]": { type: '4fv', value: [1.0, 1.0, 0.0, 0.5]},
 //        "uLightColor[2]": { type: '4fv', value: [0.2, 0.2, 1.0, 0.9]},
     };
+    
+//    for(var i = 0 ; i < 20; i++){
+//        var position = { type: '3f', value: {
+//            x: Math.random(),
+//            y: Math.random(),
+//            z: 0.006
+//        }};
+//                       
+//        var color = { type: '4fv', value: [
+//            Math.random() / 3.0 + 0.5,
+//            Math.random() / 3.0 + 0.5,
+//            Math.random() / 3.0 + 0.5,
+//            Math.random() / 3.3 + 0.6
+//        ]};
+//        
+//        customUniforms["uLightPos[" + i + "]"] = position;
+//        customUniforms["uLightColor[" + i + "]"] = color;
+//    }
+//    
+    
+    
     
     filter = new Phaser.Filter(game, customUniforms, fragmentSrc);
     filter.setResolution(512, 512);
